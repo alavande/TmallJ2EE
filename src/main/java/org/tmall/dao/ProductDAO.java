@@ -38,17 +38,18 @@ public class ProductDAO {
     // 新增商品信息
     public void add(Product bean) {
 
-        String sql = "insert into Product values(null,?,?,?,?,?,?,?)";
+        String sql = "insert into Product values(null,?,?,?,?,?,?,?,?)";
         try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);) {
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
             ps.setString(1, bean.getName());
             ps.setString(2, bean.getSubTitle());
-            ps.setFloat(3, bean.getOrignalPrice());
+            ps.setFloat(3, bean.getOriginalPrice());
             ps.setFloat(4, bean.getPromotePrice());
             ps.setInt(5, bean.getStock());
             ps.setInt(6, bean.getCategory().getId());
             ps.setTimestamp(7, DateUtil.d2t(bean.getCreateDate()));
+            ps.setTimestamp(8, null);
             ps.execute();
 
             // 获得自动递增主键，即商品ID
@@ -66,18 +67,18 @@ public class ProductDAO {
     // 更新商品信息
     public void update(Product bean) {
 
-        String sql = "update Product set name= ?, subTitle=?, orignalPrice=?," +
-                "promotePrice=?,stock=?, cid = ?, createDate=? where id = ?";
+        String sql = "update Product set name= ?, subTitle=?, originalPrice=?," +
+                "promotePrice=?,stock=?, cid = ?, updateDate=? where id = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);) {
 
             ps.setString(1, bean.getName());
             ps.setString(2, bean.getSubTitle());
-            ps.setFloat(3, bean.getOrignalPrice());
+            ps.setFloat(3, bean.getOriginalPrice());
             ps.setFloat(4, bean.getPromotePrice());
             ps.setInt(5, bean.getStock());
             ps.setInt(6, bean.getCategory().getId());
-            ps.setTimestamp(7, DateUtil.d2t(bean.getCreateDate()));
+            ps.setTimestamp(7, DateUtil.d2t(bean.getUpdateDate()));
             ps.setInt(8, bean.getId());
             ps.execute();
 
@@ -119,7 +120,7 @@ public class ProductDAO {
 
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
-                float orignalPrice = rs.getFloat("orignalPrice");
+                float originalPrice = rs.getFloat("originalPrice");
                 float promotePrice = rs.getFloat("promotePrice");
                 int stock = rs.getInt("stock");
                 int cid = rs.getInt("cid");
@@ -127,7 +128,7 @@ public class ProductDAO {
 
                 bean.setName(name);
                 bean.setSubTitle(subTitle);
-                bean.setOrignalPrice(orignalPrice);
+                bean.setOriginalPrice(originalPrice);
                 bean.setPromotePrice(promotePrice);
                 bean.setStock(stock);
                 Category category = new CategoryDAO().getCategoryById(cid);
@@ -168,14 +169,14 @@ public class ProductDAO {
                 int id = rs.getInt(1);
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
-                float orignalPrice = rs.getFloat("orignalPrice");
+                float originalPrice = rs.getFloat("originalPrice");
                 float promotePrice = rs.getFloat("promotePrice");
                 int stock = rs.getInt("stock");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
 
                 bean.setName(name);
                 bean.setSubTitle(subTitle);
-                bean.setOrignalPrice(orignalPrice);
+                bean.setOriginalPrice(originalPrice);
                 bean.setPromotePrice(promotePrice);
                 bean.setStock(stock);
                 bean.setCreateDate(createDate);
@@ -216,14 +217,14 @@ public class ProductDAO {
                 int cid = rs.getInt("cid");
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
-                float orignalPrice = rs.getFloat("orignalPrice");
+                float originalPrice = rs.getFloat("originalPrice");
                 float promotePrice = rs.getFloat("promotePrice");
                 int stock = rs.getInt("stock");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
 
                 bean.setName(name);
                 bean.setSubTitle(subTitle);
-                bean.setOrignalPrice(orignalPrice);
+                bean.setOriginalPrice(originalPrice);
                 bean.setPromotePrice(promotePrice);
                 bean.setStock(stock);
                 bean.setCreateDate(createDate);
@@ -319,14 +320,14 @@ public class ProductDAO {
                 int cid = rs.getInt("cid");
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
-                float orignalPrice = rs.getFloat("orignalPrice");
+                float originalPrice = rs.getFloat("originalPrice");
                 float promotePrice = rs.getFloat("promotePrice");
                 int stock = rs.getInt("stock");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
 
                 bean.setName(name);
                 bean.setSubTitle(subTitle);
-                bean.setOrignalPrice(orignalPrice);
+                bean.setOriginalPrice(originalPrice);
                 bean.setPromotePrice(promotePrice);
                 bean.setStock(stock);
                 bean.setCreateDate(createDate);

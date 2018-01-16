@@ -5,7 +5,7 @@ package org.tmall.enums;
  */
 public enum OrderStateEnum {
     WAIT_PAY(0, "待付款"),
-    WAIT_DELIVERY(1, "代发货"),
+    WAIT_DELIVERY(1, "待发货"),
     WAIT_CONFIRM(2, "待收货"),
     WAIT_REVIEW(3, "待评价"),
     FINISH(4, "完成"),

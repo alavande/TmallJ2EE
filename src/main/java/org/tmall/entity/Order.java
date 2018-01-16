@@ -1,5 +1,7 @@
 package org.tmall.entity;
 
+import org.tmall.enums.OrderStateEnum;
+
 import java.util.Date;
 import java.util.List;
 
@@ -30,8 +32,9 @@ public class Order {
 
     // 用于返回数据库中英文状态对应的中文
     public String getStatusDesc(){
-        /*TODO*/
-        return null;
+        String desc = "未知";
+        desc = OrderStateEnum.stateOf(Integer.parseInt(this.status)).getStateInfo();
+        return desc;
     }
 
     public String getOrderCode() {

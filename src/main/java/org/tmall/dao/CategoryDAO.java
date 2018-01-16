@@ -38,9 +38,10 @@ public class CategoryDAO {
         String sql = "insert into category values(null, ?)";
         try(Connection c = DBUtil.getConnection();
             // 创建预编译Statement
-            PreparedStatement ps = c.prepareStatement(sql);){
+            PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);){
 
             ps.setString(1, bean.getName());
+            ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()){
                 // 获得第一列信息，类别ID

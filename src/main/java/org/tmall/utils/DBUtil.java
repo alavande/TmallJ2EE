@@ -35,7 +35,7 @@ public class DBUtil {
 
     // 获取数据库连接
     public static Connection getConnection() throws SQLException{
-        String url = String.format("jdbc:mysql://%s:%d/%s?characterEncoding=%s", ip, port, database, encoding);
+        String url = String.format("jdbc:mysql://%s:%d/%s?useSSL=false&characterEncoding=%s", ip, port, database, encoding);
         Connection conn = DriverManager.getConnection(url, username, password);
         return conn;
     };

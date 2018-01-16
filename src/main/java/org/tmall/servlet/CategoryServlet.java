@@ -31,7 +31,7 @@ public class CategoryServlet extends BaseBackServlet {
         categoryDAO.add(c);
 
         File imageFolder = new File(request.getSession().
-                getServletContext().getRealPath("img/category"));
+                getServletContext().getRealPath("resources/img/category"));
         File file = new File(imageFolder, c.getId() + ".jpg");
 
         writeImage(is, file);
@@ -43,6 +43,14 @@ public class CategoryServlet extends BaseBackServlet {
 
         int id = Integer.parseInt(request.getParameter("id"));
         categoryDAO.delete(id);
+
+        File imageFolder = new File(request.getSession().
+                getServletContext().getRealPath("resources/img/category"));
+        File file = new File(imageFolder, id + ".jpg");
+        if (null != file && file.isFile()){
+            file.delete();
+        }
+
         return "@admin_category_list";
     }
 
@@ -52,7 +60,7 @@ public class CategoryServlet extends BaseBackServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         Category c = categoryDAO.getCategoryById(id);
         request.setAttribute("c", c);
-        return "admin/editCategory.jsp";
+        return "jsp/editCategory.jsp";
     }
 
     @Override
@@ -70,7 +78,7 @@ public class CategoryServlet extends BaseBackServlet {
         categoryDAO.update(c);
 
         File imageFolder = new File(request.getSession().
-                getServletContext().getRealPath("img/category"));
+                getServletContext().getRealPath("resources/img/category"));
         File file = new File(imageFolder, c.getId() + ".jpg");
         file.getParentFile().mkdirs();
 
@@ -87,7 +95,7 @@ public class CategoryServlet extends BaseBackServlet {
         request.setAttribute("thecs", cs);
         request.setAttribute("page", page);
 
-        return "admin/listCategory.jsp";
+        return "jsp/listCategory.jsp";
     }
 
     private void writeImage(InputStream is, File file){

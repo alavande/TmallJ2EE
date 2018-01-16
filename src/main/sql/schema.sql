@@ -14,7 +14,7 @@ CREATE TABLE user (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '用户表';
 -- 创建分类表
 CREATE TABLE category(
-  `id` int(11) NOT NULL AUTO_INCREMENT '类别ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '类别ID',
   `name` varchar(255) DEFAULT NULL COMMENT '类别名称',
   PRIMARY KEY (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT '商品分类表';

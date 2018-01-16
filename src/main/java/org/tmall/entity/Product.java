@@ -10,10 +10,11 @@ public class Product {
 
     private String name;
     private String subTitle;
-    private float orignalPrice;
+    private float originalPrice;
     private float promotePrice;
     private int stock;
     private Date createDate;
+    private Date updateDate;
     // 与 category 多对一
     private Category category;
     private int id;
@@ -46,12 +47,12 @@ public class Product {
         this.subTitle = subTitle;
     }
 
-    public float getOrignalPrice() {
-        return orignalPrice;
+    public float getOriginalPrice() {
+        return originalPrice;
     }
 
-    public void setOrignalPrice(float orignalPrice) {
-        this.orignalPrice = orignalPrice;
+    public void setOriginalPrice(float originalPrice) {
+        this.originalPrice = originalPrice;
     }
 
     public float getPromotePrice() {
@@ -76,6 +77,14 @@ public class Product {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     public Category getCategory() {
