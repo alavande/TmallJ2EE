@@ -17,14 +17,14 @@
 							<span class="loginInputIcon ">
 								<span class=" glyphicon glyphicon-user"></span>
 							</span>
-							<input id="name" name="name" placeholder="手机/会员名/邮箱" type="text">			
+							<input id="name" name="name" placeholder="手机/会员名/邮箱" type="text" style="outline:none">
 						</div>
 						
 						<div class="loginInput " >
 							<span class="loginInputIcon ">
 								<span class=" glyphicon glyphicon-lock"></span>
 							</span>
-							<input id="password" name="password"  type="password" placeholder="密码" type="text">			
+							<input id="password" name="password"  type="password" placeholder="密码" type="text" style="outline:none">
 						</div>
 									<span class="text-danger">不要输入真实的天猫账号密码</span><br><br>
 						<div>

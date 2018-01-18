@@ -39,7 +39,7 @@ public class OrderItemDAO {
 
         String sql = "insert into Order_Item values(null,?,?,?,?)";
         try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);) {
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
             ps.setInt(1, bean.getProduct().getId());
 
@@ -322,7 +322,7 @@ public class OrderItemDAO {
         int total = 0;
         try (Connection c = DBUtil.getConnection(); Statement s = c.createStatement();) {
 
-            String sql = "select sum(number) from Order_Item where pid = " + pid;
+            String sql = "select sum(number) from Order_Item where pid = " + pid + " and oid != -1";
 
             ResultSet rs = s.executeQuery(sql);
             while (rs.next()) {
