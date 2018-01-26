@@ -330,4 +330,68 @@ public class ForeServlet extends BaseForeServlet {
         request.setAttribute("os", os);
         return "bought.jsp";
     }
+
+    public String confirmPay(HttpServletRequest request, HttpServletResponse response, Page page){
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        new OrderItemDAO().fill(o);
+        request.setAttribute("o", o);
+        return "confirmPay.jsp";
+    }
+
+    public String orderConfirmed(HttpServletRequest request, HttpServletResponse response, Page page){
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        o.setStatus(OrderStateEnum.WAIT_REVIEW.getId());
+        o.setConfirmDate(new Date());
+        new OrderDAO().update(o);
+        return "orderConfirmed";
+    }
+
+    public String review(HttpServletRequest request, HttpServletResponse response, Page page){
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        new OrderItemDAO().fill(o);
+        Product p = o.getOrderItems().get(0).getProduct();
+        List<Review> reviews = new ReviewDAO().listReview(p.getId());
+        new ProductDAO().setSaleAndReviewNumber(p);
+        request.setAttribute("p", p);
+        request.setAttribute("o", o);
+        request.setAttribute("reviews", reviews);
+        return "review.jsp";
+    }
+
+    public String doreview(HttpServletRequest request, HttpServletResponse response, Page page){
+
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        o.setStatus(OrderStateEnum.FINISH.getId());
+        new OrderDAO().update(o);
+
+        int pid = Integer.parseInt(request.getParameter("pid"));
+        Product p = new ProductDAO().getProductById(pid);
+
+        String content = request.getParameter("content");
+
+        content = HtmlUtils.htmlEscape(content);
+
+        User user =(User) request.getSession().getAttribute("user");
+        Review review = new Review();
+        review.setContent(content);
+        review.setProduct(p);
+        review.setCreateDate(new Date());
+        review.setUser(user);
+        new ReviewDAO().add(review);
+        return "@forereview?oid=" + oid + "$showonly=true";
+    }
+
+    public String deleteOrder(HttpServletRequest request, HttpServletResponse response, Page page){
+        String result = "fail";
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        o.setStatus(OrderStateEnum.DELETE.getId());
+        if(new OrderDAO().update(o))
+            result = "success";
+        return "%" + result;
+    }
 }

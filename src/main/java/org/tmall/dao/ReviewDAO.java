@@ -58,7 +58,7 @@ public class ReviewDAO {
 
         String sql = "insert into Review values(null,?,?,?,?)";
         try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);) {
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
             ps.setString(1, bean.getContent());
             ps.setInt(2, bean.getUser().getId());

@@ -69,8 +69,9 @@ public class OrderDAO {
     }
 
     // 更新订单记录
-    public void update(Order bean) {
+    public boolean update(Order bean) {
 
+        boolean result = false;
         String sql = "update order_ set address= ?, post=?, receiver=?,mobile=?,userMessage=? ,createDate = ? , " +
                 "payDate =? , deliveryDate =?, confirmDate = ? , orderCode =?, uid=?, status=? where id = ?";
         try (Connection c = DBUtil.getConnection();
@@ -89,13 +90,14 @@ public class OrderDAO {
             ps.setInt(11, bean.getUser().getId());
             ps.setInt(12, bean.getStatus());
             ps.setInt(13, bean.getId());
-            ps.execute();
+            if(ps.executeUpdate() > 0)
+                result = true;
 
         } catch (SQLException e) {
 
             e.printStackTrace();
         }
-
+        return result;
     }
 
     // 删除订单
