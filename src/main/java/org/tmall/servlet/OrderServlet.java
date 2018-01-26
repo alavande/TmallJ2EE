@@ -26,7 +26,7 @@ public class OrderServlet extends BaseBackServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         Order o = orderDAO.getOrderById(id);
         o.setDeliveryDate(new Date());
-        o.setStatus(OrderStateEnum.WAIT_CONFIRM.getId() + "");
+        o.setStatus(OrderStateEnum.WAIT_CONFIRM.getId());
         orderDAO.update(o);
         return "@admin_order_list";
     }

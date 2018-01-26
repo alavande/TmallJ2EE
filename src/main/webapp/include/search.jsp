@@ -7,8 +7,8 @@
 	
 	<form action="foresearch" method="post" >	
 		<div class="searchDiv">
-			<input name="keyword" type="text" placeholder="时尚男鞋  太阳镜 ">
-			<button  type="submit" class="searchButton">搜索</button>
+			<input name="keyword" type="text" placeholder="时尚男鞋  太阳镜 " style="margin-left:2px;padding-left:5px" value="${param.keyword}">
+			<button  type="submit" class="searchButton" style="outline:none">搜索</button>
 			<div class="searchBelow">
 				<c:forEach items="${cs}" var="c" varStatus="st">
 					<c:if test="${st.count>=5 and st.count<=8}">

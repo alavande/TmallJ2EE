@@ -85,37 +85,40 @@
                    if ('true' == result) {
                        var num = $('.productNumberSetting').val();
                        location.href = $('.buyLink').attr('href') + '&num=' + num;
+                       return true;
                    } else {
                        $('#loginModal').modal('show');
+                       return false;
                    }
            });
+           return false;
        });
 
-       $('.loginSubmitButton').click(function () {
-           var name = $('#name').val();
-           var password = $('#password').val();
-           if (name.length == 0 || password.length == 0){
-               $('.errorMessage').html("请输入账号密码");
-               $('.loginErrorMessageDiv').show();
+        $('.loginSubmitButton').click(function () {
+            var name = $('#name').val();
+            var password = $('#password').val();
+            if (name.length == 0 || password.length == 0){
+                $('.errorMessage').html("请输入账号密码");
+                $('.loginErrorMessageDiv').show();
 
-           } else {
-               var page = 'foreloginModal';
-               $.get(
-                   page,
-                   {
-                       "name": name,
-                       "password": password
-                   },
-                   function (result) {
-                         if ('true' == result){
-                             location.reload();
-                         } else {
-                             $('.errorMessage').html("账号密码错误");
-                             $('.loginErrorMessageDiv').show();
-                         }
-               });
-           }
-       });
+            } else {
+                var page = 'foreloginModal';
+                $.get(
+                    page,
+                    {
+                        "name": name,
+                        "password": password
+                    },
+                    function (result) {
+                        if ('true' == result){
+                            location.reload();
+                        } else {
+                            $('.errorMessage').html("账号密码错误");
+                            $('.loginErrorMessageDiv').show();
+                        }
+                    });
+            }
+        });
     });
 </script>
 

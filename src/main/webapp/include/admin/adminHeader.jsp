@@ -13,6 +13,7 @@
     <link href="resources/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
     <script src="resources/js/bootstrap/3.3.6/bootstrap.min.js"></script>
     <link href="resources/css/back/style.css" rel="stylesheet">
+    <script src="resources/layer/layer.js"></script>
     <%-- 预定义判断输入框函数--%>
     <script>
         function checkEmpty(id, name) {

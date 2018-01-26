@@ -1,5 +1,6 @@
 package org.tmall.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.tmall.entity.Order;
 import org.tmall.entity.OrderItem;
 import org.tmall.entity.Product;
@@ -65,8 +66,8 @@ public class OrderItemDAO {
     }
 
     // 更新订单项
-    public void update(OrderItem bean) {
-
+    public boolean update(OrderItem bean) {
+        boolean result = false;
         String sql = "update Order_Item set pid= ?, oid=?, uid=?,number=?  where id = ?";
         try (Connection c = DBUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);) {
@@ -80,29 +81,34 @@ public class OrderItemDAO {
             ps.setInt(4, bean.getNumber());
 
             ps.setInt(5, bean.getId());
-            ps.execute();
+            if(ps.executeUpdate() > 0)
+                result = true;
 
         } catch (SQLException e) {
 
             e.printStackTrace();
         }
-
+        return result;
     }
 
     // 删除订单项
-    public void delete(int id) {
+    public boolean delete(int id) {
 
+        boolean result = false;
         try (Connection c = DBUtil.getConnection();
              Statement s = c.createStatement();) {
 
             String sql = "delete from Order_Item where id = " + id;
 
-            s.execute(sql);
+            if(s.executeUpdate(sql) > 0)
+                result = true;
 
         } catch (SQLException e) {
 
             e.printStackTrace();
         }
+
+        return result;
     }
 
     // 根据ID获得某一订单项
@@ -315,6 +321,31 @@ public class OrderItemDAO {
             e.printStackTrace();
         }
         return beans;
+    }
+
+    public OrderItem getOrderItemByUserAndProduct(int uid, int pid){
+
+        OrderItem bean = null;
+
+        String sql = "select * from Order_Item where oid = -1 and uid = ? and pid = ?";
+        try(Connection c = DBUtil.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql);){
+
+            ps.setInt(1, uid);
+            ps.setInt(2, pid);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()){
+                bean = new OrderItem();
+                bean.setId(rs.getInt(1));
+                bean.setUser(new UserDAO().getUserById(uid));
+                bean.setProduct(new ProductDAO().getProductById(pid));
+                bean.setNumber(rs.getInt(5));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return bean;
     }
 
     // 获得某一商品销售总量

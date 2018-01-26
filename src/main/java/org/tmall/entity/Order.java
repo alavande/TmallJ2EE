@@ -28,12 +28,12 @@ public class Order {
     private float total;
     // 当前订单商品总数量
     private int totalNumber;
-    private String status;
+    private int status;
 
     // 用于返回数据库中英文状态对应的中文
     public String getStatusDesc(){
         String desc = "未知";
-        desc = OrderStateEnum.stateOf(Integer.parseInt(this.status)).getStateInfo();
+        desc = OrderStateEnum.stateOf(this.status).getStateInfo();
         return desc;
     }
 
@@ -157,11 +157,11 @@ public class Order {
         this.totalNumber = totalNumber;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 }

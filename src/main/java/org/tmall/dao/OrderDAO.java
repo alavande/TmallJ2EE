@@ -39,7 +39,7 @@ public class OrderDAO {
 
         String sql = "insert into order_ values(null,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (Connection c = DBUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);) {
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 
             ps.setString(1, bean.getOrderCode());
             ps.setString(2, bean.getAddress());
@@ -53,9 +53,9 @@ public class OrderDAO {
             ps.setTimestamp(9,  DateUtil.d2t(bean.getDeliveryDate()));
             ps.setTimestamp(10,  DateUtil.d2t(bean.getConfirmDate()));
             ps.setInt(11, bean.getUser().getId());
-            ps.setString(12, bean.getStatus());
+            ps.setInt(12, bean.getStatus());
 
-            ps.execute();
+            ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -87,7 +87,7 @@ public class OrderDAO {
             ps.setTimestamp(9, DateUtil.d2t(bean.getConfirmDate()));;
             ps.setString(10, bean.getOrderCode());
             ps.setInt(11, bean.getUser().getId());
-            ps.setString(12, bean.getStatus());
+            ps.setInt(12, bean.getStatus());
             ps.setInt(13, bean.getId());
             ps.execute();
 
@@ -131,7 +131,7 @@ public class OrderDAO {
                 String receiver = rs.getString("receiver");
                 String mobile = rs.getString("mobile");
                 String userMessage = rs.getString("userMessage");
-                String status = rs.getString("status");
+                int status = rs.getInt("status");
                 int uid =rs.getInt("uid");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
                 Date payDate = DateUtil.t2d( rs.getTimestamp("payDate"));
@@ -189,7 +189,7 @@ public class OrderDAO {
                 String receiver = rs.getString("receiver");
                 String mobile = rs.getString("mobile");
                 String userMessage = rs.getString("userMessage");
-                String status = rs.getString("status");
+                int status = rs.getInt("status");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
                 Date payDate = DateUtil.t2d( rs.getTimestamp("payDate"));
                 Date deliveryDate = DateUtil.t2d( rs.getTimestamp("deliveryDate"));
@@ -221,12 +221,12 @@ public class OrderDAO {
     }
 
     // 获得除某种状态之外的所有订单
-    public List<Order> listOrderExcept(int uid,String excludedStatus) {
+    public List<Order> listOrderExcept(int uid,int excludedStatus) {
         return listOrderExcept(uid,excludedStatus,0, Short.MAX_VALUE);
     }
 
     // 获得偏移量下除某种状态之外的所有订单
-    public List<Order> listOrderExcept(int uid, String excludedStatus, int start, int count) {
+    public List<Order> listOrderExcept(int uid, int excludedStatus, int start, int count) {
         /*TODO*/
         List<Order> beans = new ArrayList<Order>();
 
@@ -236,7 +236,7 @@ public class OrderDAO {
              PreparedStatement ps = c.prepareStatement(sql);) {
 
             ps.setInt(1, uid);
-            ps.setString(2, excludedStatus);
+            ps.setInt(2, excludedStatus);
             ps.setInt(3, start);
             ps.setInt(4, count);
 
@@ -250,7 +250,7 @@ public class OrderDAO {
                 String receiver = rs.getString("receiver");
                 String mobile = rs.getString("mobile");
                 String userMessage = rs.getString("userMessage");
-                String status = rs.getString("status");
+                int status = rs.getInt("status");
                 Date createDate = DateUtil.t2d( rs.getTimestamp("createDate"));
                 Date payDate = DateUtil.t2d( rs.getTimestamp("payDate"));
                 Date deliveryDate = DateUtil.t2d( rs.getTimestamp("deliveryDate"));

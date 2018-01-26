@@ -4,14 +4,14 @@ import org.springframework.web.util.HtmlUtils;
 import org.tmall.comparator.*;
 import org.tmall.dao.*;
 import org.tmall.entity.*;
+import org.tmall.enums.OrderStateEnum;
 import org.tmall.utils.Page;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ForeServlet extends BaseForeServlet {
 
@@ -91,10 +91,13 @@ public class ForeServlet extends BaseForeServlet {
 
         String result = "false";
         User user = (User) request.getSession().getAttribute("user");
-
-        user = new UserDAO().getUserByNameAndPassword(user.getName(), user.getPassword());
-        if (null != user){
-            result = "true";
+        try {
+            user = new UserDAO().getUserByNameAndPassword(user.getName(), user.getPassword());
+            if (null != user) {
+                result = "true";
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
         return "%" + result;
     }
@@ -121,7 +124,7 @@ public class ForeServlet extends BaseForeServlet {
         Category c = new CategoryDAO().getCategoryById(cid);
         new ProductDAO().fill(c);
         new ProductDAO().setSaleAndReviewNumber(c.getProducts());
-
+        String orientation = "down";
         String sort = request.getParameter("sort");
         if(null != sort){
             switch (sort){
@@ -132,7 +135,10 @@ public class ForeServlet extends BaseForeServlet {
                     Collections.sort(c.getProducts(), new ProductDateComparator());
                     break;
                 case "price":
+                    orientation = request.getParameter("orientation");
                     Collections.sort(c.getProducts(), new ProductPriceComparator());
+                    if("up".equals(orientation))
+                        Collections.reverse(c.getProducts());
                     break;
                 case "review":
                     Collections.sort(c.getProducts(), new ProductReviewComparator());
@@ -145,7 +151,16 @@ public class ForeServlet extends BaseForeServlet {
             }
         }
         request.setAttribute("c", c);
+        request.setAttribute("orientation", orientation);
         return "category.jsp";
+    }
+
+    public String search(HttpServletRequest request, HttpServletResponse response, Page page){
+        String keyword = request.getParameter("keyword");
+        List<Product> ps = new ProductDAO().search(keyword, page.getStart(), page.getCount());
+        new ProductDAO().setSaleAndReviewNumber(ps);
+        request.setAttribute("ps", ps);
+        return "searchResult.jsp";
     }
 
     public String addCart(HttpServletRequest request, HttpServletResponse response, Page page){
@@ -157,20 +172,16 @@ public class ForeServlet extends BaseForeServlet {
             Product p = new ProductDAO().getProductById(pid);
             User user = (User) request.getSession().getAttribute("user");
 
-            boolean exist = false;
-            List<OrderItem> ois = new OrderItemDAO().listOrderItemByUser(user.getId());
-            for (OrderItem o : ois){
-                if (o.getProduct().getId() == p.getId()){
-                    o.setNumber(o.getNumber() + num);
-                    exist = true;
-                    new OrderItemDAO().update(o);
-                    result = "true";
-                    break;
-                }
-            }
-
-            if (!exist) {
-                OrderItem oi = new OrderItem();
+            OrderItem oi = new OrderItemDAO().getOrderItemByUserAndProduct(user.getId(), p.getId());
+            if (null != oi){
+                if(oi.getNumber() + num > p.getStock())
+                    oi.setNumber(p.getStock());
+                else
+                    oi.setNumber(oi.getNumber() + num);
+                new OrderItemDAO().update(oi);
+                result = "true";
+            } else{
+                oi = new OrderItem();
                 oi.setProduct(p);
                 oi.setUser(user);
                 oi.setNumber(num);
@@ -185,8 +196,138 @@ public class ForeServlet extends BaseForeServlet {
         return "%" + result;
     }
 
-    public String buyone(){
+    public String cart(HttpServletRequest request, HttpServletResponse response, Page page){
 
-        return "";
+        User user = (User) request.getSession().getAttribute("user");
+        List<OrderItem> ois = new OrderItemDAO().listOrderItemByUser(user.getId());
+        request.setAttribute("ois", ois);
+        return "cart.jsp";
+    }
+
+    public String cartController(HttpServletRequest request, HttpServletResponse response, Page page){
+        String result = "false";
+        int oiid = Integer.parseInt(request.getParameter("oiid"));
+        String action = request.getParameter("action");
+
+        switch (action){
+            case "delete":
+                if (new OrderItemDAO().delete(oiid))
+                    result = "true";
+                break;
+            case "update":
+                OrderItem oi = new OrderItemDAO().getOrderItemById(oiid);
+                int num = Integer.parseInt(request.getParameter("num"));
+                oi.setNumber(num);
+                if(new OrderItemDAO().update(oi))
+                    result = "true";
+                break;
+            default:
+                break;
+        }
+
+        return "%" + result;
+    }
+
+    public String buyone(HttpServletRequest request, HttpServletResponse response, Page page){
+        int pid = Integer.parseInt(request.getParameter("pid"));
+        int num = Integer.parseInt(request.getParameter("num"));
+
+        Product p = new ProductDAO().getProductById(pid);
+        User user = (User) request.getSession().getAttribute("user");
+
+        OrderItem oi = new OrderItemDAO().getOrderItemByUserAndProduct(user.getId(), p.getId());
+        int oiId = -1;
+        if (null != oi){
+            if(oi.getNumber() + num > p.getStock())
+                oi.setNumber(p.getStock());
+            else
+                oi.setNumber(oi.getNumber() + num);
+            new OrderItemDAO().update(oi);
+            oiId = oi.getId();
+
+        }else {
+            oi = new OrderItem();
+            oi.setNumber(num);
+            oi.setUser(user);
+            oi.setProduct(p);
+            new OrderItemDAO().add(oi);
+            oiId = oi.getId();
+        }
+        return "@forebuy?oiid=" + oiId;
+    }
+
+    public String buy(HttpServletRequest request, HttpServletResponse response, Page page){
+
+        String[] oiIds = request.getParameterValues("oiid");
+        List<OrderItem> ois = new ArrayList<>();
+        float total = 0;
+        for(String oiId : oiIds){
+            int id = Integer.parseInt(oiId);
+            OrderItem oi = new OrderItemDAO().getOrderItemById(id);
+            total += oi.getNumber() * oi.getProduct().getPromotePrice();
+            ois.add(oi);
+        }
+
+        request.getSession().setAttribute("ois", ois);
+        request.setAttribute("total", total);
+        return "buy.jsp";
+    }
+
+    public String createOrder(HttpServletRequest request, HttpServletResponse response, Page page){
+        User user = (User) request.getSession().getAttribute("user");
+
+        List<OrderItem> ois = (List<OrderItem>) request.getSession().getAttribute("ois");
+        if (null == ois || ois.isEmpty())
+            return "@login.jsp";
+
+        String address = request.getParameter("address");
+        String post = request.getParameter("post");
+        String receiver = request.getParameter("receiver");
+        String mobile = request.getParameter("mobile");
+        String userMessage = request.getParameter("userMessage");
+
+        String orderCode = new SimpleDateFormat("yyyyMMdd").format(new Date()) + Math.round(new Random().nextDouble()*1000000000);
+        Order o = new Order();
+        o.setAddress(address);
+        o.setMobile(mobile);
+        o.setPost(post);
+        o.setReceiver(receiver);
+        o.setUser(user);
+        o.setUserMessage(null == userMessage?"":userMessage);
+        o.setOrderCode(orderCode);
+        o.setCreateDate(new Date());
+        o.setStatus(OrderStateEnum.WAIT_PAY.getId());
+        new OrderDAO().add(o);
+
+        float totalPrice = 0;
+        for(OrderItem oi : ois){
+            oi.setOrder(o);
+            new OrderItemDAO().update(oi);
+            totalPrice += oi.getProduct().getPromotePrice()*oi.getNumber();
+        }
+
+        return "@forealipay?oid=" + o.getId() + "&total=" + totalPrice;
+    }
+
+    public String alipay(HttpServletRequest request, HttpServletResponse response, Page page){
+        return "alipay.jsp";
+    }
+
+    public String payed(HttpServletRequest request, HttpServletResponse response, Page page){
+        int oid = Integer.parseInt(request.getParameter("oid"));
+        Order o = new OrderDAO().getOrderById(oid);
+        o.setStatus(OrderStateEnum.WAIT_DELIVERY.getId());
+        o.setPayDate(new Date());
+        new OrderDAO().update(o);
+        request.setAttribute("o", o);
+        return "payed.jsp";
+    }
+
+    public String bought(HttpServletRequest request, HttpServletResponse response, Page page){
+        User user = (User) request.getSession().getAttribute("user");
+        List<Order> os = new OrderDAO().listOrderExcept(user.getId(), OrderStateEnum.DELETE.getId());
+        new OrderItemDAO().fill(os);
+        request.setAttribute("os", os);
+        return "bought.jsp";
     }
 }

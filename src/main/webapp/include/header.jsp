@@ -14,6 +14,7 @@
 	<link href="resources/css/bootstrap/3.3.6/bootstrap.min.css" rel="stylesheet">
 	<script src="resources/js/bootstrap/3.3.6/bootstrap.min.js"></script>
 	<link href="resources/css/fore/style.css" rel="stylesheet">
+	<script src="resources/layer/layer.js"></script>
 <script>
 function formatMoney(num){
 	num = num.toString().replace(/\$|\,/g,'');  

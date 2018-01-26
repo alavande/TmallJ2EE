@@ -1,6 +1,27 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8"
 	pageEncoding="UTF-8" isELIgnored="false"%>
 
+<script>
+	$(function () {
+	    root = '<%=request.getSession().getServletContext().getContextPath()%>';
+        $('.my').click(function () {
+            var page = "forecheckLogin";
+            var path = $(this).attr('href');
+            $.get(
+                page,
+                function (result) {
+                    if ('true' == result) {
+                        location.href = path;
+                        return true;
+                    } else {
+                        location.href = "login.jsp";
+					}
+                });
+            return false;
+        });
+    });
+</script>
+
 <nav class="top ">
 		<a href="${contextPath}">
 			<span style="color:#C40000;margin:0px" class="glyphicon glyphicon-home redColor"></span>
@@ -20,13 +41,11 @@
 		</c:if>
 
 		<span class="pull-right">
-			<a href="forebought">我的订单</a>
-			<a href="forecart">
+			<a href="forebought" class="my">我的订单</a>
+			<a href="forecart" class="my">
 			<span style="color:#C40000;margin:0px" class="glyphicon glyphicon-shopping-cart redColor"></span>
 			购物车<strong id="cartNum">${cartTotalItemNumber}</strong>件</a>
 		</span>
-		
-		
 </nav>
 
 
